@@ -46,6 +46,53 @@ public class BDao {
 //		}
 	}
 	
+	public BDto contentView(String id) {
+		upHit(id); // 조회수 + 1
+
+		BDto dto = null;
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			conn = dataSource.getConnection();
+			
+			String query = "select * from mvc_board where bId = ?";
+			pstmt = conn.prepareStatement(query);
+			pstmt.setInt(1, Integer.parseInt(id));
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				int bId = rs.getInt("bId");
+				String bName = rs.getString("bName");
+				String bTitle = rs.getString("bTitle");
+				String bContent = rs.getString("bContent");
+				Timestamp bDate = rs.getTimestamp("bDate");
+				int bHit = rs.getInt("bHit");
+				int bGroup = rs.getInt("bGroup");
+				int bStep = rs.getInt("bStep");
+				int bIndent = rs.getInt("bIndent");
+				
+				dto = new BDto(bId, bName, bTitle, bContent, bDate, bHit, bGroup, bStep, bIndent);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) rs.close();
+				if(pstmt != null) pstmt.close();
+				if(conn != null) conn.close();
+			} catch (Exception e2) {
+				// TODO: handle exception
+				e2.printStackTrace();
+			}
+		}
+		
+		return dto;
+	}
+	
 	public void write(String bName, String bTitle, String bContent) {
 		// TODO Auto-generated method stub
 		
@@ -117,5 +164,31 @@ public class BDao {
 			}
 		}
 		return dtos;
+	}
+	
+	// 조회수 올리기
+	private void upHit(String bId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			conn = dataSource.getConnection();
+			String query = "update mvc_board set bHit = bHit + 1 where bId = ?";
+			pstmt = conn.prepareStatement(query);
+			pstmt.setString(1, bId);
+			
+			int rn = pstmt.executeUpdate();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+				if(conn != null) conn.close();
+			} catch(Exception e2) {
+				e2.printStackTrace();
+			}
+		}
 	}
 }

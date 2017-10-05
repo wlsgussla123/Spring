@@ -6,6 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.ui.Model;
 
+import com.jinhyeonpark.demo.dao.BDao;
+import com.jinhyeonpark.demo.dto.BDto;
+
 // 게시판 글을 보는 서비스
 public class BContentCommand implements BCommand {
 
@@ -17,6 +20,10 @@ public class BContentCommand implements BCommand {
 		HttpServletRequest request = (HttpServletRequest) map.get("request");
 		String bId = request.getParameter("bId");
 		
+		BDao dao = new BDao();
+		BDto dto = dao.contentView(bId);
+		
+		model.addAttribute("content_view", dto);
 	}
 
 }
